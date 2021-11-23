@@ -108,9 +108,9 @@ public class FCB {
     @Override
     public String toString() {
         if(this.type=='1'){
-            return String.format("%-15s    %-8s    %-6d    %-20s",dateTime,"        ",size,name);
+            return String.format("%-16s    %-8s    %-6d    %-20s",dateTime,"        ",size,name);
         }else {
-            return String.format("%-15s    %-8s    %-6s    %-20s",dateTime,"<DIR>","",name);
+            return String.format("%-16s    %-8s    %-6s    %-20s",dateTime,"<DIR>","",name);
         }
 
     }

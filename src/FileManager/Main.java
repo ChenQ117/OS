@@ -1,5 +1,7 @@
-package FileManager.dataStruct;
+package FileManager;
 
+import FileManager.dataStruct.FAT;
+import FileManager.dataStruct.FCB;
 import FileManager.utils.FCBUtils;
 import processSchedue.dataStruct.Bitmap;
 import processSchedue.dataStruct.utils.BitmapUtils;
@@ -68,7 +70,11 @@ public class Main {
                 break;
                 case "dir":
                 case "DIR":{
-                    fcbUtils.DIR_Command(root);
+                    if (split.length == 2){
+                        fcbUtils.DIR_Command(root,split[1].trim());
+                    }else {
+                        fcbUtils.DIR_Command(root,"*");
+                    }
                 }
                 break;
                 case "cd":
@@ -79,6 +85,7 @@ public class Main {
                             cd_com(split[1]);
                             break;
                         }
+                        //如果是以根目录开头的一个路径
                         String[] split1 = split[1].split("\\\\");
                         if (split1[0].equals("")){
                             split1[0] = "\\";
@@ -100,7 +107,16 @@ public class Main {
                 case "del":
                 case "DEL":{
                     if (split.length == 2){
-                        fcbUtils.DEL_Command(split[1],root,bitmap);
+                        fcbUtils.DEL_Command(split[1],root,bitmap,'1');
+                    }else {
+                        System.out.println(command+"语法错误");
+                    }
+                }
+                break;
+                case "RD":
+                case "rd":{
+                    if (split.length == 2){
+                        fcbUtils.DEL_Command(split[1],root,bitmap,'2');
                     }else {
                         System.out.println(command+"语法错误");
                     }
@@ -142,12 +158,13 @@ public class Main {
         System.out.println("mk filename size:创建一个指定大小的文件");
         System.out.println("md directoryname:创建一个空文件夹");
         System.out.println("del filename:删除指定的文件或指定的空文件夹");
+        System.out.println("rd directory:删除指定的空文件夹");
         System.out.println("cd path:实现绝对路径或相对路径的跳转");
         System.out.println("dir:显示当前目录下的文件或文件夹信息");
         System.out.println("info:查看磁盘块占用情况");
         System.out.println("fat:查看fat表");
         System.out.println("tree:查看树形结构");
-        System.out.println("help:查看帮助");
+        System.out.println("help:查看命令提示");
         System.out.println("exit:结束");
     }
     public static void showPath(String path){

@@ -13,6 +13,7 @@ public class Bitmap {
     private char[] tmp;
     private int[] showtmp;
     private int size;//空闲的内存块数
+
     public Bitmap(){
 
     }

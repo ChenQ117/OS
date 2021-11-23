@@ -9,6 +9,7 @@ import processSchedue.dataStruct.PageLine;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @version v1.0
@@ -76,12 +77,25 @@ public class FCBUtils {
 //        fcb.setUpper(root);
     }
     //列出文件目录
-    public void DIR_Command(FCB root){
+    public void DIR_Command(FCB root,String fileName){
         FCB head = root.getChild();
         System.out.println(String.format("%-15s    %-8s    %-6s    %-20s",root.getDateTime(),"<DIR>","","."));
         System.out.println(String.format("%-15s    %-8s    %-6s    %-20s",root.getDateTime(),"<DIR>","",".."));
+        String[] split = fileName.split("(?=\\*)|(?<=\\*)");
+        StringBuilder sb = new StringBuilder();
+        for (int i=0;i<split.length;i++){
+//            System.out.println(i+split[i]);
+            if (split[i].equals("*")){
+                sb.append("(.)*");
+            }else {
+                sb.append(split[i]);
+            }
+        }
+        Pattern pattern =Pattern.compile(sb.toString());
         while (head!=null){
-            System.out.println(head.toString());
+            if (pattern.matcher(head.getName()).matches()){
+                System.out.println(head.toString());
+            }
             head = head.getBrother();
         }
     }
@@ -114,11 +128,11 @@ public class FCBUtils {
         }
         return flag;
     }
-    //创建文件或文件夹
+    //创建文件或目录
     public void MK_Command(String name, String fileSize, char type, FCB root, Bitmap bitmap){
         try {
             if (isHasName(name,root)!=null){
-                System.out.println(name+"文件或文件夹已存在，无法创建");
+                System.out.println(name+"文件或目录已存在，无法创建");
                 return;
             }
             int size = Integer.parseInt(fileSize);
@@ -139,24 +153,28 @@ public class FCBUtils {
         }
     }
     //删除文件
-    public void DEL_Command(String name,FCB root,Bitmap bitmap){
+    public void DEL_Command(String name,FCB root,Bitmap bitmap,char type){
         FCB fcb = isHasName(name,root);
         if (fcb==null){
-            System.out.println(name+"文件或文件夹不存在，无法删除");
+            System.out.println(name+"文件或目录不存在，无法删除");
+            return;
+        }
+        if (fcb.getType()!=type){
+            System.out.println("文件或目录不存在，无法删除");
             return;
         }
         if (fcb.getType()=='2'&&fcb.getChild()!=null){
-            System.out.println(name+"文件夹不为空，不允许删除");
+            System.out.println(name+"目录不为空，不允许删除");
         }else {
             int last = fcb.getFirstBlock();//找出在fat表中值为FF的下标
             int index = fat.getFatValue(last);
             while (index!=FAT.FF){
+                fat.setFatValue(last,-1);
                 last = index;
                 bitmap.setBit(index/8,index%8,0);
-                fat.setFatValue(index,-1);
                 index = fat.getFatValue(index);
             }
-            System.out.println("151 FCBU:"+last);
+//            System.out.println("151 FCBU:"+last);
             bitmap.setBit(last/8,last%8,0);
             fat.setFatValue(last,-1);
             FCB upper = fcb.getUpper();
